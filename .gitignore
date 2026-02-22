@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Runtime artifacts
+models/*.joblib
+models/*.json
+logs/*.log
+data/*.csv
+data/*.pkl
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env

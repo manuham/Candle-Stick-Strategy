@@ -1,0 +1,131 @@
+# =============================================================================
+# Candlestick Strategy Configuration
+# =============================================================================
+
+# --- Symbols ---
+symbols:
+  forex:
+    - EURUSD
+    - GBPUSD
+    - USDJPY
+    - AUDUSD
+  indices:
+    - US500
+    - US100
+    - GER40
+  commodities:
+    - XAUUSD
+    - XTIUSD
+
+# --- Timeframes ---
+timeframes:
+  trend: H4        # Higher TF for trend context
+  signal: H1       # Primary signal generation
+  entry: M15       # Precise entry timing
+
+# Data fetch sizes (number of bars)
+bar_counts:
+  trend: 200
+  signal: 500
+  entry: 500
+
+# --- Pattern Detection ---
+patterns:
+  min_body_ratio: 0.01          # Minimum body/range ratio to not be a doji
+  doji_max_body_ratio: 0.1      # Max body/range for doji classification
+  engulfing_margin: 0.0         # How much the engulfing body must exceed (0 = exact)
+  shadow_multiplier: 2.0        # Shadow must be >= N * body for hammer/star
+  max_opposite_shadow: 0.3      # Max opposite shadow as fraction of body
+  star_max_body_ratio: 0.3      # Max body ratio for the middle star candle
+  soldiers_min_body_ratio: 0.5  # Min body ratio for three soldiers/crows
+
+# --- Indicators ---
+indicators:
+  rsi_period: 14
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+  bb_period: 20
+  bb_std: 2
+  atr_period: 14
+  ema_fast: 50
+  ema_slow: 200
+  volume_sma_period: 20
+  stoch_period: 14
+  stoch_smooth: 3
+  adx_period: 14
+
+# --- Confluence Scoring ---
+confluence:
+  min_score: 60                 # Minimum score to generate a signal (0-100)
+  weights:
+    h4_trend_alignment: 30      # Max points from H4 trend
+    h1_pattern_indicator: 40    # Max points from H1 pattern + indicators
+    m15_entry_confirmation: 30  # Max points from M15 entry
+
+# --- ML Model ---
+ml:
+  enabled: true
+  model_type: xgboost
+  confidence_threshold: 0.65    # Min ML probability to trade
+  lookforward_bars: 24          # Bars to check for R:R target (1 day on H1)
+  rr_target: 2.0                # Risk-reward target for labeling
+  train_test_split: 0.8
+  model_path: models/xgb_model.joblib
+  xgboost_params:
+    n_estimators: 300
+    max_depth: 6
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    min_child_weight: 3
+    reg_alpha: 0.1
+    reg_lambda: 1.0
+
+# --- Risk Management ---
+risk:
+  max_risk_per_trade: 0.01      # 1% of account
+  max_risk_cap: 0.02            # Hard cap at 2% even if Kelly suggests more
+  max_daily_drawdown: 0.03      # 3% daily loss limit
+  max_open_positions: 5
+  max_correlated_positions: 2   # Max positions in same currency
+  min_risk_reward: 2.0          # Minimum R:R ratio
+  sl_atr_multiplier: 1.5        # SL = 1.5 * ATR
+  tp_rr_ratio: 2.0              # TP = 2.0 * SL distance
+  trailing:
+    enabled: true
+    breakeven_at_rr: 1.0        # Move SL to breakeven at 1:1 R:R
+    trail_atr_multiplier: 1.0   # Trail distance after activation
+    trail_activate_rr: 1.5      # Start trailing after 1.5:1 R:R
+  spread_filter_multiplier: 2.0 # Skip if spread > 2x average
+  close_before_eod_minutes: 30  # Close positions N min before day end
+
+# --- Execution ---
+execution:
+  magic_number: 234000
+  comment_prefix: "CS_"
+  slippage_points: 10
+  max_retries: 3
+  retry_delay_seconds: 1
+
+# --- Kelly Criterion ---
+kelly:
+  enabled: true
+  fraction: 0.5                 # Half Kelly (conservative)
+  min_trades_required: 30       # Min trades before Kelly kicks in
+  lookback_trades: 100          # Use last N trades for Kelly calculation
+  default_risk: 0.01            # Default risk before enough trades
+
+# --- Backtesting ---
+backtest:
+  initial_balance: 10000
+  commission_per_lot: 7.0       # USD per round trip per lot
+  default_spread_points: 15     # Default spread in points
+  slippage_points: 5
+
+# --- Logging ---
+logging:
+  level: INFO
+  file: logs/strategy.log
+  max_bytes: 10485760           # 10 MB
+  backup_count: 5
