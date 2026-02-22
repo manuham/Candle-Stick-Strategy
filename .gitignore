@@ -25,6 +25,7 @@ models/*.json
 logs/*.log
 data/*.csv
 data/*.pkl
+backtest_results/
 
 # OS
 .DS_Store
