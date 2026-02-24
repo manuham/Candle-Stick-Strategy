@@ -25,15 +25,20 @@ jobs:
       - name: Install TA-Lib C library
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget build-essential
-          wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
-          tar -xzf ta-lib-0.4.0-src.tar.gz
-          cd ta-lib
+          sudo apt-get install -y build-essential wget
+          wget -q https://github.com/TA-Lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz \
+            || wget -q https://sourceforge.net/projects/ta-lib/files/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz/download -O ta-lib-0.4.0-src.tar.gz
+          if [ -f ta-lib-0.6.4-src.tar.gz ]; then
+            tar -xzf ta-lib-0.6.4-src.tar.gz
+            cd ta-lib-0.6.4
+          else
+            tar -xzf ta-lib-0.4.0-src.tar.gz
+            cd ta-lib
+          fi
           ./configure --prefix=/usr
-          make
+          make -j$(nproc)
           sudo make install
-          cd ..
-          rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+          sudo ldconfig
 
       - name: Install Python dependencies
         run: |
