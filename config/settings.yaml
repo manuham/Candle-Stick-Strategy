@@ -123,6 +123,23 @@ backtest:
   default_spread_points: 15     # Default spread in points
   slippage_points: 5
 
+# --- Notifications ---
+notifications:
+  enabled: false                  # Master switch
+  telegram:
+    enabled: false
+    bot_token: ""                 # Telegram Bot API token
+    chat_id: ""                   # Target chat/group ID
+  discord:
+    enabled: false
+    webhook_url: ""               # Discord webhook URL
+
+# --- Monitoring API ---
+monitoring:
+  enabled: false
+  host: "0.0.0.0"
+  port: 8080
+
 # --- Logging ---
 logging:
   level: INFO
