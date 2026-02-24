@@ -6,7 +6,7 @@ Tracks equity curve, positions, and trade log.
 """
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
@@ -15,7 +15,6 @@ import pandas as pd
 
 from src.patterns import detect_all as detect_patterns
 from src.indicators import calculate_all as calculate_indicators
-from src.confluence import evaluate_confluence
 from src.ml_scorer import MLScorer
 
 logger = logging.getLogger("strategy")
@@ -211,7 +210,6 @@ class BacktestEngine:
             # Close positions (reverse order to preserve indices)
             for j, exit_price, exit_reason in sorted(positions_to_close, reverse=True):
                 pos = open_positions.pop(j)
-                point_value = 1.0  # simplified for backtest
                 if pos.direction == "BUY":
                     pnl_pips = (exit_price - pos.entry_price)
                 else:

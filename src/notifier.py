@@ -19,7 +19,6 @@ Configuration via settings.yaml:
 
 import json
 import logging
-from typing import Optional
 from urllib.request import Request, urlopen
 from urllib.error import URLError
 

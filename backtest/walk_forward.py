@@ -136,12 +136,12 @@ class WalkForwardOptimizer:
             test_h4 = None
             if df_h4 is not None and not df_h4.empty:
                 train_h4 = df_h4[
-                    (df_h4.index >= train_h1.index[0]) &
-                    (df_h4.index <= train_h1.index[-1])
+                    (df_h4.index >= train_h1.index[0])
+                    & (df_h4.index <= train_h1.index[-1])
                 ]
                 test_h4 = df_h4[
-                    (df_h4.index >= test_h1.index[0]) &
-                    (df_h4.index <= test_h1.index[-1])
+                    (df_h4.index >= test_h1.index[0])
+                    & (df_h4.index <= test_h1.index[-1])
                 ]
                 if train_h4.empty:
                     train_h4 = None

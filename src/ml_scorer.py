@@ -300,7 +300,6 @@ class MLScorer:
 
         # Evaluate
         y_pred = self.model.predict(X_test)
-        y_proba = self.model.predict_proba(X_test)[:, 1]
 
         metrics = {
             "accuracy": accuracy_score(y_test, y_pred),

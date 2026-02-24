@@ -11,9 +11,8 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-import pytz
 
-from src.utils import resolve_timeframe, UTC
+from src.utils import resolve_timeframe
 
 logger = logging.getLogger("strategy")
 
