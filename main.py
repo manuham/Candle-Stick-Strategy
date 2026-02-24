@@ -20,6 +20,8 @@ from src.signals import SignalGenerator
 from src.ml_scorer import MLScorer
 from src.risk_manager import RiskManager, TradeRecord
 from src.executor import Executor
+from src.notifier import Notifier
+from src.monitor import MonitorServer, strategy_state
 
 
 def parse_args():
@@ -60,6 +62,11 @@ def main():
     signal_gen = SignalGenerator(config, ml_scorer)
     risk_manager = RiskManager(config)
     executor = Executor(config)
+    notifier = Notifier(config)
+    monitor = MonitorServer(config)
+    monitor.start()
+
+    strategy_state.update(started_at=utc_now(), is_running=True)
 
     symbols = get_all_symbols(config)
     logger.info(f"Trading symbols: {symbols}")
@@ -68,6 +75,10 @@ def main():
     account = data_engine.get_account_info()
     if account:
         risk_manager.reset_daily(account["balance"])
+        strategy_state.update(
+            account_balance=account["balance"],
+            account_equity=account.get("equity", account["balance"]),
+        )
         logger.info(f"Account balance: {account['balance']:.2f} {account['currency']}")
 
     # Graceful shutdown handler
@@ -103,6 +114,8 @@ def main():
             account = data_engine.get_account_info()
             if account and not risk_manager.check_daily_drawdown(account["balance"]):
                 logger.warning("Daily drawdown limit reached — waiting for next day")
+                dd_pct = (risk_manager.daily_start_balance - account["balance"]) / risk_manager.daily_start_balance
+                notifier.notify_drawdown_warning(dd_pct, risk_manager.max_daily_drawdown)
                 time.sleep(300)
                 continue
 
@@ -132,6 +145,12 @@ def main():
 
                     if trade_signal is None:
                         continue
+
+                    notifier.notify_signal(trade_signal)
+                    strategy_state.update(
+                        signals_generated=strategy_state.signals_generated + 1,
+                        last_signal=trade_signal.to_dict(),
+                    )
 
                     # Risk checks
                     open_positions = executor.get_open_positions()
@@ -180,6 +199,7 @@ def main():
                         )
                         if result:
                             logger.info(f"Trade executed: {result}")
+                            notifier.notify_order_opened(result)
                     else:
                         logger.info(
                             f"[DRY RUN] Would execute: {trade_signal.direction} "
@@ -188,12 +208,25 @@ def main():
 
                 except Exception as e:
                     logger.error(f"Error processing {symbol}: {e}", exc_info=True)
+                    notifier.notify_error(f"Error processing {symbol}: {e}")
 
             # Check and apply trailing stops
             if not args.dry_run:
                 executor.check_and_trail(
                     risk_manager, data_engine,
                     config.get("indicators", {}),
+                )
+
+            # Update monitoring state
+            strategy_state.update(
+                last_scan_time=utc_now(),
+                daily_pnl=risk_manager.daily_pnl,
+                open_positions=executor.get_open_positions() if not args.dry_run else [],
+            )
+            if account:
+                strategy_state.update(
+                    account_balance=account["balance"],
+                    account_equity=account.get("equity", account["balance"]),
                 )
 
             # Sleep until next check (aligned to M15 bar boundaries)
@@ -210,6 +243,8 @@ def main():
                 logger.info(f"Closing {len(open_pos)} remaining positions (day trading mode)")
                 executor.close_all_positions()
 
+        strategy_state.update(is_running=False)
+        monitor.stop()
         data_engine.disconnect()
         logger.info("Strategy shutdown complete")
 
