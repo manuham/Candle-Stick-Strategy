@@ -16,8 +16,8 @@ UTC = pytz.timezone("Etc/UTC")
 
 # Market session boundaries (UTC hours)
 SESSIONS = {
-    "ASIAN":    (0, 8),
-    "LONDON":   (8, 16),
+    "ASIAN": (0, 8),
+    "LONDON": (8, 16),
     "NEW_YORK": (13, 21),
 }
 

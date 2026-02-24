@@ -13,10 +13,9 @@ from dataclasses import dataclass
 from typing import List
 
 import numpy as np
-import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # noqa: E402
 
 logger = logging.getLogger("strategy")
 
@@ -236,18 +235,18 @@ class MonteCarloSimulator:
         print(f"         ({result.iterations:,} iterations)")
         print("=" * 60)
 
-        print(f"\n  Final Equity:")
+        print("\n  Final Equity:")
         print(f"    5th percentile:   ${ci['final_equity']['5th']:>12,.2f}")
         print(f"    25th percentile:  ${ci['final_equity']['25th']:>12,.2f}")
         print(f"    Median:           ${ci['final_equity']['50th']:>12,.2f}")
         print(f"    75th percentile:  ${ci['final_equity']['75th']:>12,.2f}")
         print(f"    95th percentile:  ${ci['final_equity']['95th']:>12,.2f}")
 
-        print(f"\n  Max Drawdown:")
+        print("\n  Max Drawdown:")
         print(f"    Median:           {ci['max_drawdown']['50th']:>10.2f}%")
         print(f"    95% confidence:   < {ci['max_drawdown']['95th']:.2f}%")
 
-        print(f"\n  Sharpe Ratio:")
+        print("\n  Sharpe Ratio:")
         print(f"    Median:           {ci['sharpe_ratio']['50th']:>10.2f}")
         print(f"    95% range:        {ci['sharpe_ratio']['5th']:.2f} to {ci['sharpe_ratio']['95th']:.2f}")
 

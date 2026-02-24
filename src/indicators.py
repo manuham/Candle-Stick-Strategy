@@ -26,9 +26,8 @@ def calculate_all(df: pd.DataFrame, config: dict = None) -> pd.DataFrame:
 
     result = df.copy()
 
-    o = result["open"].values.astype(float)
     h = result["high"].values.astype(float)
-    l = result["low"].values.astype(float)
+    low = result["low"].values.astype(float)
     c = result["close"].values.astype(float)
     v = result.get("volume", result.get("tick_volume", pd.Series(0, index=result.index))).values.astype(float)
 
@@ -63,7 +62,7 @@ def calculate_all(df: pd.DataFrame, config: dict = None) -> pd.DataFrame:
 
     # --- ATR ---
     atr_period = config.get("atr_period", 14)
-    result["atr"] = talib.ATR(h, l, c, timeperiod=atr_period)
+    result["atr"] = talib.ATR(h, low, c, timeperiod=atr_period)
 
     # --- EMA (fast and slow) ---
     ema_fast_period = config.get("ema_fast", 50)
@@ -81,7 +80,7 @@ def calculate_all(df: pd.DataFrame, config: dict = None) -> pd.DataFrame:
     stoch_period = config.get("stoch_period", 14)
     stoch_smooth = config.get("stoch_smooth", 3)
     stoch_k, stoch_d = talib.STOCH(
-        h, l, c,
+        h, low, c,
         fastk_period=stoch_period, slowk_period=stoch_smooth,
         slowk_matype=0, slowd_period=stoch_smooth, slowd_matype=0,
     )
@@ -90,7 +89,7 @@ def calculate_all(df: pd.DataFrame, config: dict = None) -> pd.DataFrame:
 
     # --- ADX (trend strength) ---
     adx_period = config.get("adx_period", 14)
-    result["adx"] = talib.ADX(h, l, c, timeperiod=adx_period)
+    result["adx"] = talib.ADX(h, low, c, timeperiod=adx_period)
 
     # --- Derived features ---
     # Trend direction based on EMAs

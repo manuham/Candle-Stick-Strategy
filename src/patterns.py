@@ -29,17 +29,17 @@ def candle_properties(df: pd.DataFrame) -> pd.DataFrame:
     """
     o = df["open"].values
     h = df["high"].values
-    l = df["low"].values
+    low = df["low"].values
     c = df["close"].values
 
     body = c - o                          # signed: positive = bullish
     body_abs = np.abs(body)
-    candle_range = h - l
+    candle_range = h - low
     # Avoid division by zero for doji-like candles
     safe_range = np.where(candle_range == 0, 1e-10, candle_range)
 
     upper_shadow = h - np.maximum(o, c)
-    lower_shadow = np.minimum(o, c) - l
+    lower_shadow = np.minimum(o, c) - low
     body_ratio = body_abs / safe_range
 
     props = df.copy()

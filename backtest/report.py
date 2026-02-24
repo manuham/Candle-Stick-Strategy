@@ -3,14 +3,12 @@ Backtest Reporting — Performance visualization and summary statistics.
 """
 
 import logging
-from typing import List
-
 import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use("Agg")  # Non-interactive backend
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
+import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.dates as mdates  # noqa: E402
 
 logger = logging.getLogger("strategy")
 
